@@ -103,14 +103,15 @@ mkdir ~/docker/nodered
 version: '3'
 
 services:
-grafana:
-image: grafana/grafana:latest
-restart: always
-ports:
-- "3000:3000"
-volumes:
-- ./data:/var/lib/grafana
-- ./logs:/var/log/grafana
+  grafana:
+    image: grafana/grafana:latest
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/var/lib/grafana
+      - ./logs:/var/log/grafana
+
 ```
 
 4. Repeat this step for InfluxDB and Node-RED.
