@@ -37,7 +37,7 @@ sudo usermod -aG docker gurinder
 
 1. Download the latest version of Docker Compose:
 ```
-sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 ```
 
 2. Apply executable permissions to the binary:
@@ -53,22 +53,27 @@ docker-compose --version
 ## Configure Docker Compose to start on system boot
 
 1. Create a systemd unit file for Docker Compose:
+a. For Grafana
 ```
-sudo nano /etc/systemd/system/docker-compose@.service
+sudo nano /etc/systemd/system/grafana.service
 ```
 
 
 2. Paste the following contents into the `docker-compose@.service` file:
 ```
+[Unit]
+Description=Grafana service
+Requires=docker.service
+After=docker.service
+
 [Service]
 Restart=always
-TimeoutStartSec=0
-WorkingDirectory=%i
-ExecStart=/usr/local/bin/docker-compose up
-ExecStop=/usr/local/bin/docker-compose down
+ExecStart=/usr/local/bin/docker-compose -f /home/gurinder/docker/grafana/docker-compose.yml up
+ExecStop=/usr/local/bin/docker-compose -f /home/gurinder/docker/grafana/docker-compose.yml down
 
 [Install]
 WantedBy=multi-user.target
+
 ```
 
 
@@ -81,7 +86,7 @@ sudo systemctl daemon-reload
 
 5. Enable your Docker Compose file to start on system boot:
 ```
-sudo systemctl enable docker-compose@docker-compose.service
+sudo systemctl enable grafana.service
 ```
 
 ## Create Docker Compose files for each service
@@ -103,14 +108,15 @@ mkdir ~/docker/nodered
 version: '3'
 
 services:
-grafana:
-image: grafana/grafana:latest
-restart: always
-ports:
-- "3000:3000"
-volumes:
-- ./data:/var/lib/grafana
-- ./logs:/var/log/grafana
+  grafana:
+    image: grafana/grafana:latest
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/var/lib/grafana
+      - ./logs:/var/log/grafana
+
 ```
 
 4. Repeat this step for InfluxDB and Node-RED.
